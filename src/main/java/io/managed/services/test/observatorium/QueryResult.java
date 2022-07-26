@@ -27,6 +27,10 @@ public class QueryResult {
             return value.get(1).toString();
         }
 
+        public Double doubleValue() {
+            return Double.valueOf(value());
+        }
+
         public Long longValue() {
             return Long.valueOf(value());
         }
