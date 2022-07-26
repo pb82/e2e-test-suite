@@ -4,12 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.apache.kafka.common.protocol.types.Field;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 public class ObservatoriumClient {
@@ -20,6 +25,10 @@ public class ObservatoriumClient {
     private OkHttpClient httpClient = new OkHttpClient();
 
     public ObservatoriumClient() {
+    }
+
+    public QueryResult query(Query query) throws ObservatoriumException {
+        return query(query.toString());
     }
 
     public QueryResult query(String query) throws ObservatoriumException {
@@ -50,6 +59,32 @@ public class ObservatoriumClient {
             return mapper.readValue(response.body().string(), QueryResult.class);
         } catch (IOException ex) {
             throw new ObservatoriumException(ex);
+        }
+    }
+
+    public static class Query {
+        private String metric;
+
+        private List labels = new ArrayList<>();
+
+        public Query metric(String metric) {
+            this.metric = metric;
+            return this;
+        }
+
+        public Query label(String label, String value) {
+            labels.add(String.format("%s='%s'", label, value));
+            return this;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(metric);
+            sb.append("{");
+            sb.append(String.join(",", labels));
+            sb.append("}");
+            return sb.toString();
         }
     }
 }
