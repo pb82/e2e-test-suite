@@ -345,4 +345,14 @@ public class TestUtils {
 
         return context;
     }
+
+    public static boolean inRange(Double expected, Double actual, Double allowedDifferencePercentage) {
+        double lowerBound = actual * (1 - (allowedDifferencePercentage / 100));
+        double upperBound = actual * (1 + (allowedDifferencePercentage / 100));
+        return expected >= lowerBound && expected <= upperBound;
+    }
+
+    public static double increasePercentage(Double oldValue, Double newValue) {
+        return ((newValue - oldValue) / oldValue) * 100;
+    }
 }
